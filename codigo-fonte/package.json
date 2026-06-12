@@ -1,0 +1,19 @@
+{
+  "name": "med-estoque-app",
+  "private": true,
+  "description": "Aplicação completa de controle de estoque médico",
+  "scripts": {
+    "start": "npm --prefix frontend start",
+    "build": "npm --prefix frontend run build",
+    "server": "npm --prefix backend start",
+    "server:dev": "npm --prefix backend run dev",
+    "dev": "concurrently \"npm run server:dev\" \"npm start\""
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

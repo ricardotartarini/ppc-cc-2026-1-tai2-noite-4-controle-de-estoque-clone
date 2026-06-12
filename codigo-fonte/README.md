@@ -1,18 +1,87 @@
-# Instruções de utilização
+# Controle de Estoque Médico & Acadêmico
 
-## Estratégia de Organização de Codificação 
+Este projeto é um sistema completo de gestão de estoque focado na área da saúde, com frontend React.js e backend Node.js/Express integrado ao Supabase.
 
-Nesse primeiro eixo do curso, para simplificar a utilização do Git e a organização das pastas e artefatos de implementação no sistema de arquivos, sugerimos que o projeto seja estruturado de modo que cada aluno trabalhe com seus arquivos nas suas respectivas pastas, identificadas por nomes das suas respectivas telas. Por exemplo:
-- Pasta src (root do projeto): index.html, index.css, index.js - Desenvolvedora responsável: Aluna X.
-- Pasta src\clientes: clientes.html, clientes.css, clientes.js - Desenvolvedor responsável: Aluno Y.
-- Pasta src\funcionarios: funcionarios.html, funcionarios.css, funcionarios.js  - Desenvolvedora responsável: Aluna Z.
+## Estrutura
+- `/frontend-web`: Aplicação React.js (interface do usuário).
+- `/backend`: API REST Node.js/Express (servidor backend).
+- `frontend-web/src/services/`: Serviços para comunicação com a API.
 
-## Instalação do Site
+## Pré-requisitos
+- Node.js (versão 16 ou superior)
+- Conta no Supabase (para banco de dados)
 
-O site em HTML/CSS/JS é um projeto estático. É necessário implantá-lo em um servidor web de sua preferência. Existem diversos servidores web gratuitos que podem ser utilizados, tal como GitHub Pages (GitHub.IO), Vercel, Render, Netlify, Surge.sh, entre outros. Nesse primeiro eixo, recomenda-se inclusive a utilização do GitHub Pages. [Insira o endereço eletrônico público para acessá-lo.] 
+## Configuração Inicial
 
-## Histórico de versões
+### 1. Backend
+1. Entre na pasta `backend`:
+   ```bash
+   cd backend
+   ```
 
-### [0.1.0] - DD/MM/AAAA
-#### Adicionado/Atualizado/Removido
-- Relação de artefatos ...
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+3. Configure o arquivo `.env` com suas credenciais do Supabase:
+   ```env
+   SUPABASE_URL=https://seu-projeto.supabase.co
+   SUPABASE_ANON_KEY=sua-chave-anonima
+   SUPABASE_SERVICE_ROLE_KEY=sua-chave-de-servico
+   JWT_SECRET=seu-segredo-jwt-seguro
+   PORT=5000
+   ```
+
+4. Crie as tabelas no Supabase (veja `backend/README.md` para os scripts SQL).
+
+### 2. Frontend
+1. Entre na pasta `frontend-web`:
+   ```bash
+   cd frontend-web
+   ```
+
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+3. Configure o arquivo `.env.local`:
+   ```env
+   REACT_APP_API_URL=http://localhost:5000
+   ```
+
+## Como Executar
+
+### Desenvolvimento (Frontend + Backend simultaneamente)
+Na raiz do projeto:
+```bash
+npm run dev
+```
+
+### Apenas Frontend
+```bash
+npm start
+```
+
+### Apenas Backend
+```bash
+npm run server:dev
+```
+
+## Funcionalidades
+- **Autenticação**: Login e registro de usuários (professores/técnicos)
+- **Controle de Estoque**: Visualização, entradas e saídas de materiais
+- **Solicitações de Compra**: Professores podem solicitar compras de materiais
+- **Interface Responsiva**: Design moderno e intuitivo
+
+## Segurança
+- Autenticação JWT
+- Validação de dados
+- Controle de acesso baseado em roles
+- Comunicação segura entre frontend e backend
+
+## Requisitos Atendidos
+- RF-01 a RF-07 (Cadastro, Entradas, Saídas, Visualização)
+- RNF-01 a RNF-05 (Interface intuitiva, dados claros)
+- Segurança aprimorada com backend dedicado
