@@ -1,0 +1,23 @@
+/* Tema da área logada (login usa apenas Login.css) */
+:root {
+  --app-bg: #07101f;
+  --app-bg-accent: #102a4f;
+  --app-surface: rgba(255, 255, 255, 0.12);
+  --app-surface-strong: rgba(255, 255, 255, 0.18);
+  --app-surface-soft: rgba(255, 255, 255, 0.08);
+  --app-surface-border: rgba(255, 255, 255, 0.18);
+  --app-text: #f8fafc;
+  --app-text-muted: #cbd5e1;
+  --app-primary: #96d4ff;
+  --app-primary-hover: #7dc5ff;
+  --app-primary-soft: rgba(125, 211, 252, 0.2);
+  --app-secondary: #7c3aed;
+  --app-secondary-soft: rgba(124, 58, 237, 0.16);
+  --app-nav-bg: rgba(7, 16, 31, 0.82);
+  --app-nav-border: rgba(255, 255, 255, 0.14);
+  --app-shadow: 0 22px 80px rgba(11, 21, 41, 0.22);
+  --app-shadow-lg: 0 30px 100px rgba(11, 21, 41, 0.28);
+  --app-radius: 22px;
+  --app-radius-sm: 14px;
+  --app-transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
