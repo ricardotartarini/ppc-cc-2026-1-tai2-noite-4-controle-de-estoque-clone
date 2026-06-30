@@ -44,7 +44,23 @@ export default function SolicitarCompraMateriais() {
         setCategorias(listaCategorias);
       }
     };
+
     carregarProdutos();
+
+    const channel = supabase
+      .channel('laboratorio-produtos-compra')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'laboratorio_produtos' },
+        () => {
+          carregarProdutos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const produtosFiltrados = produtosBanco.filter(p => p.categoria === categoria);

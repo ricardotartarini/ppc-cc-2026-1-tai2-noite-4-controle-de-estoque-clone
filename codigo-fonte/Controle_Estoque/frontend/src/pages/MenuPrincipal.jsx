@@ -24,30 +24,52 @@ export default function MenuPrincipal() {
     else if (hora >= 12 && hora < 18) setSaudacao('Boa tarde');
     else setSaudacao('Boa noite');
 
-    const getUserAndData = async () => {
+    let userRoleRef = 'professor';
+
+    const carregarAlertas = async (role) => {
+      const r = role || userRoleRef;
+      if (r !== 'tecnico') return;
+
+      const { count: countEstoque } = await supabase
+        .from('laboratorio_produtos')
+        .select('*', { count: 'exact', head: true })
+        .lt('quantidade', 5);
+      setProdutosEmBaixa(countEstoque || 0);
+
+      const { count: countPedidos } = await supabase
+        .from('solicitacoes_compra')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Pendente');
+      setPedidosPendentes(countPedidos || 0);
+    };
+
+    const init = async () => {
       const u = await authService.getUser();
       setUser(u);
-
-      const userRole = u?.userType || u?.tipo || u?.role || 'professor';
-
-      if (userRole === 'tecnico') {
-        const { count: countEstoque } = await supabase
-          .from('laboratorio_produtos')
-          .select('*', { count: 'exact', head: true })
-          .lt('quantidade', 5);
-        
-        setProdutosEmBaixa(countEstoque || 0);
-
-        const { count: countPedidos } = await supabase
-          .from('solicitacoes_compra')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'Pendente');
-
-        setPedidosPendentes(countPedidos || 0);
-      }
+      userRoleRef = u?.userType || u?.tipo || u?.role || 'professor';
+      await carregarAlertas(userRoleRef);
     };
-    
-    getUserAndData();
+
+    init();
+
+    const channelEstoque = supabase
+      .channel('laboratorio-produtos-menu')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'laboratorio_produtos' }, () => {
+        carregarAlertas();
+      })
+      .subscribe();
+
+    const channelCompras = supabase
+      .channel('solicitacoes-compra-menu')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'solicitacoes_compra' }, () => {
+        carregarAlertas();
+      })
+      .subscribe();
+
+    return () => {
+      channelEstoque.unsubscribe();
+      channelCompras.unsubscribe();
+    };
   }, []);
 
   const userRole = user?.userType || user?.tipo || user?.role || 'professor'; 

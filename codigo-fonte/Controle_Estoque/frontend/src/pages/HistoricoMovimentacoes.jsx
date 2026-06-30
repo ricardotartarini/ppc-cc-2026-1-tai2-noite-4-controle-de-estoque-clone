@@ -11,6 +11,28 @@ export default function HistoricoMovimentacoes() {
 
   useEffect(() => {
     carregarDados();
+
+    const channel = supabase
+      .channel('auditoria-movimentacoes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'laboratorio_produtos' },
+        () => {
+          carregarDados();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'movimentacoes' },
+        () => {
+          carregarDados();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const carregarDados = async () => {

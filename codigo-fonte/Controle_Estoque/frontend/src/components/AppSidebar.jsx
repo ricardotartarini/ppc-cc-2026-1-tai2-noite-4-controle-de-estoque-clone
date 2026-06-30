@@ -12,7 +12,8 @@ const TEC_LINKS = [
   { to: '/movimentacao', label: 'Movimentação' },
   { to: '/tecnico/solicitar-compra', label: 'Solicitar compra' },
   { to: '/tecnico/minhas-solicitacoes', label: 'Minhas solicitações' },
-  { to: '/tecnico/historico', label: 'Auditoria' }
+  { to: '/tecnico/historico', label: 'Auditoria' },
+  { to: '/tecnico/gerenciar-professores', label: 'Professores' }
 ];
 
 function linkClass({ isActive }) {

@@ -203,14 +203,13 @@ app.post('/api/auth/register', async (req, res) => {
     }
 
     if (insertError) {
-      // Se falhar ao inserir, deletar o usuário de auth
-      await supabase.auth.admin.deleteUser(createdUser.user.id);
       console.error('Erro insert usuarios:', insertError);
-      let errorMessage = insertError?.message || 'Erro ao finalizar registro do usuário';
-      if (isTableMissingError(insertError)) {
-        errorMessage = 'Tabela "usuarios" não encontrada no banco. Execute migrations_usuarios.sql no Supabase e tente novamente.';
-      }
-      return res.status(400).json({ error: errorMessage });
+      console.error('Detalhes do usuário criado no Auth:', createdUser?.user?.id, email);
+
+      const errorMessage = insertError?.message || 'Erro ao finalizar registro do usuário';
+      return res.status(400).json({
+        error: `Não foi possível salvar o perfil do usuário. Verifique a tabela usuarios no Supabase. Detalhe: ${errorMessage}`
+      });
     }
 
     const token = jwt.sign(
@@ -232,6 +231,120 @@ app.post('/api/auth/register', async (req, res) => {
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ error: error.message || 'Erro interno do servidor' });
+  }
+});
+
+// Users Routes
+app.get('/api/usuarios/professores', authenticateToken, async (req, res) => {
+  try {
+    const { data: usuariosData, error: usuariosError } = await supabase
+      .from('usuarios')
+      .select('id, email, nome_completo, codigo_professor, tipo_usuario')
+      .or('tipo_usuario.eq.professor,tipo_usuario.eq.Professor,tipo_usuario.eq.PROFESSOR')
+      .order('nome_completo', { ascending: true });
+
+    let professores = [];
+
+    if (!usuariosError && Array.isArray(usuariosData)) {
+      professores = usuariosData.filter((usuario) => {
+        const tipo = String(usuario?.tipo_usuario || '').toLowerCase();
+        return tipo === 'professor';
+      });
+    } else if (usuariosError) {
+      console.error('Erro ao buscar professores na tabela usuarios:', usuariosError);
+    }
+
+    const { data: authUsersData, error: authUsersError } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+
+    if (!authUsersError && authUsersData?.users) {
+      const professoresAuth = authUsersData.users.filter((usuario) => {
+        const metadata = usuario?.user_metadata || {};
+        const tipo = String(metadata.user_type || metadata.role || metadata.tipo || '').toLowerCase();
+        return tipo === 'professor';
+      });
+
+      const mapaProfessores = new Map(professores.map((professor) => [professor.id, professor]));
+
+      const professoresMesclados = professoresAuth.map((usuario) => {
+        const professorDb = mapaProfessores.get(usuario.id);
+        return {
+          id: usuario.id,
+          email: usuario.email,
+          nome_completo: professorDb?.nome_completo || usuario.user_metadata?.full_name || usuario.email,
+          codigo_professor: professorDb?.codigo_professor || null,
+          tipo_usuario: 'professor'
+        };
+      });
+
+      professores.forEach((professor) => {
+        if (!professoresMesclados.some((item) => item.id === professor.id)) {
+          professoresMesclados.push({
+            id: professor.id,
+            email: professor.email,
+            nome_completo: professor.nome_completo,
+            codigo_professor: professor.codigo_professor,
+            tipo_usuario: 'professor'
+          });
+        }
+      });
+
+      professoresMesclados.sort((a, b) => (a.nome_completo || '').localeCompare(b.nome_completo || ''));
+      return res.json({ professores: professoresMesclados });
+    }
+
+    res.json({ professores });
+  } catch (error) {
+    console.error('Erro interno ao listar professores:', error);
+    res.status(500).json({ error: 'Erro interno ao listar professores' });
+  }
+});
+
+app.delete('/api/usuarios/professores/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user?.userType !== 'tecnico') {
+      return res.status(403).json({ error: 'Acesso negado' });
+    }
+
+    const { data: usuarioAlvo, error: errorBusca } = await supabase
+      .from('usuarios')
+      .select('id, tipo_usuario')
+      .eq('id', id)
+      .single();
+
+    if (errorBusca || !usuarioAlvo) {
+      return res.status(404).json({ error: 'Professor não encontrado' });
+    }
+
+    if (usuarioAlvo.tipo_usuario !== 'professor') {
+      return res.status(400).json({ error: 'Apenas contas de professor podem ser removidas por esta rota.' });
+    }
+
+    if (usuarioAlvo.id === req.user?.id) {
+      return res.status(400).json({ error: 'Você não pode remover a própria conta.' });
+    }
+
+    const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(id);
+    if (deleteAuthError) {
+      console.error('Erro ao remover usuário do Auth:', deleteAuthError);
+      return res.status(500).json({ error: 'Erro ao remover conta de autenticação' });
+    }
+
+    const { error: deleteDbError } = await supabase
+      .from('usuarios')
+      .delete()
+      .eq('id', id);
+
+    if (deleteDbError) {
+      console.error('Erro ao remover usuário do banco:', deleteDbError);
+      return res.status(500).json({ error: 'Erro ao remover registro do professor' });
+    }
+
+    res.json({ message: 'Professor removido com sucesso.' });
+  } catch (error) {
+    console.error('Erro interno ao remover professor:', error);
+    res.status(500).json({ error: 'Erro interno ao remover professor' });
   }
 });
 

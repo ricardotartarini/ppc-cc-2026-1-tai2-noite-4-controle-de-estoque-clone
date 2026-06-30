@@ -24,6 +24,21 @@ export default function Movimentacao() {
 
   useEffect(() => {
     carregarProdutos();
+
+    const channel = supabase
+      .channel('laboratorio-produtos-movimentacao')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'laboratorio_produtos' },
+        () => {
+          carregarProdutos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const handleSubmit = async (e) => {

@@ -17,9 +17,9 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_tipo ON usuarios(tipo_usuario);
 -- Habilitar Row Level Security
 ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
 
--- Política para leitura do próprio perfil
-CREATE POLICY "Users can read own profile" ON usuarios
-  FOR SELECT USING (auth.uid() = id);
+-- Política permissiva para leitura de todos os usuários
+CREATE POLICY "Allow reading all users" ON usuarios
+  FOR SELECT USING (true);
 
 -- Política para atualizar o próprio perfil
 CREATE POLICY "Users can update own profile" ON usuarios

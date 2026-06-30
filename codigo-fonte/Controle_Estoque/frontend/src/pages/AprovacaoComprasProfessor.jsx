@@ -37,6 +37,21 @@ export default function AprovacaoComprasProfessor() {
 
   useEffect(() => {
     carregar();
+
+    const channel = supabase
+      .channel('solicitacoes-compra-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'solicitacoes_compra' },
+        () => {
+          carregar();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, [carregar]);
 
   const atualizarStatus = async (id, novoStatus) => {

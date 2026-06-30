@@ -20,6 +20,21 @@ export default function Dashboard() {
 
   useEffect(() => {
     carregarProdutos();
+
+    const channel = supabase
+      .channel('laboratorio-produtos-dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'laboratorio_produtos' },
+        () => {
+          carregarProdutos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const carregarProdutos = async () => {

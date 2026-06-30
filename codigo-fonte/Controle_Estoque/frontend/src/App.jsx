@@ -12,6 +12,7 @@ import AprovacaoComprasProfessor from './pages/AprovacaoComprasProfessor';
 import MenuPrincipal from './pages/MenuPrincipal';
 import ResetPassword from './pages/ResetPassword';
 import HistoricoMovimentacoes from './pages/HistoricoMovimentacoes';
+import GerenciarProfessores from './pages/GerenciarProfessores';
 import AppNavbar from './components/AppNavbar';
 import AppSidebar from './components/AppSidebar';
 
@@ -99,6 +100,7 @@ function App() {
             <Route path="/tecnico/solicitar-compra" element={<TecnicoRoute userRole={userRole}><SolicitarCompraMateriais /></TecnicoRoute>} />
             <Route path="/tecnico/minhas-solicitacoes" element={<TecnicoRoute userRole={userRole}><MinhasSolicitacoesCompra /></TecnicoRoute>} />
             <Route path="/tecnico/historico" element={<TecnicoRoute userRole={userRole}><HistoricoMovimentacoes /></TecnicoRoute>} />
+            <Route path="/tecnico/gerenciar-professores" element={<TecnicoRoute userRole={userRole}><GerenciarProfessores /></TecnicoRoute>} />
 
             <Route path="/professor/saida-laboratorio" element={<ProfessorRoute userRole={userRole}><SaidaLaboratorioProfessor /></ProfessorRoute>} />
             <Route path="/professor/aprovar-compras" element={<ProfessorRoute userRole={userRole}><AprovacaoComprasProfessor /></ProfessorRoute>} />
