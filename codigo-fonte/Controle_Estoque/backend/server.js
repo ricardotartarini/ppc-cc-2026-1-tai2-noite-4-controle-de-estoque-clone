@@ -58,11 +58,12 @@ const gerarCodigoProfessor = () => {
 
 // Função para validar se é email ou código de professor
 // Código de professor: 8 dígitos numéricos (ex: 12345678)
-const identificarEntrada = (entrada) => {
+// Apenas professores podem autenticar com código.
+const identificarEntrada = (entrada, userType) => {
   if (entrada.includes('@')) {
     return { tipo: 'email', valor: entrada };
   }
-  if (/^\d{8}$/.test(entrada)) {
+  if (userType === 'professor' && /^\d{8}$/.test(entrada)) {
     return { tipo: 'codigo_professor', valor: entrada };
   }
   return { tipo: 'email', valor: entrada }; // Padrão como email
@@ -88,7 +89,8 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email/Código e senha são obrigatórios' });
     }
 
-    const entradaIdentificada = identificarEntrada(entrada);
+    const entradaNormalizada = String(entrada).trim();
+    const entradaIdentificada = identificarEntrada(entradaNormalizada, userType);
 
     let usuarioData = null;
     let emailDoBanco = null;
@@ -108,7 +110,7 @@ app.post('/api/auth/login', async (req, res) => {
 
       emailDoBanco = usuario.email;
     } else {
-      emailDoBanco = entrada;
+      emailDoBanco = entradaNormalizada;
     }
 
     // Fazer login com o email encontrado
