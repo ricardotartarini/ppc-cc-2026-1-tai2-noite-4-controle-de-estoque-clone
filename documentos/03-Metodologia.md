@@ -54,4 +54,4 @@ Os artefatos do projeto são desenvolvidos a partir de diversas plataformas. A r
 
 ## Estratégia de Organização de Codificação
 
-Todos os artefatos relacionados à implementação e visualização dos conteúdos do projeto do site foram inseridos na pasta principal do repositório, seguindo as boas práticas do GitHub GitFlow (com commits focados nas branches de desenvolvimento antes do merge final na branch `main` para a entrega do MVP).
+Todos os artefatos relacionados à implementação e visualização dos conteúdos do projeto do site foram inseridos na pasta principal do repositório, seguindo as boas práticas do GitHub GitFlow.
