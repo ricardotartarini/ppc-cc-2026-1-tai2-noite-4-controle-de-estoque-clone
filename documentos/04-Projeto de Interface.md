@@ -22,6 +22,8 @@ Abaixo estão documentadas as telas reais da aplicação que compõem o MVP fina
 Uma interface centralizada onde o usuário escolhe o seu perfil de acesso (**Professor** ou **Técnico**) e insere suas credenciais de forma segura.
 
 <img width="1896" height="866" alt="Captura de tela 2026-07-01 094313" src="https://github.com/user-attachments/assets/bec3360e-4ae3-4614-b61b-616e3ebddb42" />
+<img width="1876" height="857" alt="Captura de tela 2026-07-01 100916" src="https://github.com/user-attachments/assets/b729be50-78a5-4de6-9e7f-25e57be28ddc" />
+
 
 ---
 
