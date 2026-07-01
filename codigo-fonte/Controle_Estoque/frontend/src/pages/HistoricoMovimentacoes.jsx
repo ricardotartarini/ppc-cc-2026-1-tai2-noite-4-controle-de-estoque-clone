@@ -5,6 +5,7 @@ import { supabase } from '../services/supabase';
 export default function HistoricoMovimentacoes() {
   const [historico, setHistorico] = useState([]);
   const [produtos, setProdutos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtroTipo, setFiltroTipo] = useState('');
   const [busca, setBusca] = useState('');
@@ -43,6 +44,11 @@ export default function HistoricoMovimentacoes() {
         .select('id, nome, codigo');
       setProdutos(prodData || []);
 
+      const { data: usuariosData } = await supabase
+        .from('usuarios')
+        .select('id, nome_completo, email, tipo_usuario');
+      setUsuarios(usuariosData || []);
+
       const { data: movData } = await supabase
         .from('movimentacoes')
         .select('*')
@@ -61,8 +67,14 @@ export default function HistoricoMovimentacoes() {
     return prod ? `[${prod.codigo}] ${prod.nome}` : 'Produto Desconhecido';
   };
 
+  const getResponsavel = (userId) => {
+    const usuario = usuarios.find((item) => String(item.id) === String(userId));
+    if (!usuario) return 'Sistema/Não identificado';
+    return usuario.nome_completo || usuario.email || 'Usuário sem nome';
+  };
+
   const exportarCSV = () => {
-    const headers = ['ID Movimentacao', 'Data', 'Produto', 'Tipo', 'Quantidade'];
+    const headers = ['ID Movimentacao', 'Data', 'Produto', 'Tipo', 'Quantidade', 'Responsavel'];
     
     const rows = dadosFiltrados.map(h => {
       const dataFormatada = new Date(h.data || h.created_at).toLocaleDateString('pt-BR');
@@ -71,7 +83,8 @@ export default function HistoricoMovimentacoes() {
         dataFormatada,
         `"${getNomeProduto(h.produto_id)}"`,
         h.tipo.toUpperCase(),
-        h.quantidade
+        h.quantidade,
+        `"${getResponsavel(h.user_id)}"`
       ];
     });
 
@@ -92,7 +105,9 @@ export default function HistoricoMovimentacoes() {
   const dadosFiltrados = historico.filter(item => {
     const matchTipo = filtroTipo ? item.tipo === filtroTipo : true;
     const nomeProduto = getNomeProduto(item.produto_id).toLowerCase();
-    const matchBusca = busca ? nomeProduto.includes(busca.toLowerCase()) : true;
+    const responsavel = getResponsavel(item.user_id).toLowerCase();
+    const termoBusca = busca.toLowerCase();
+    const matchBusca = busca ? nomeProduto.includes(termoBusca) || responsavel.includes(termoBusca) : true;
     return matchTipo && matchBusca;
   });
 
@@ -111,7 +126,7 @@ export default function HistoricoMovimentacoes() {
       <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <input 
           type="text" 
-          placeholder="Buscar por nome ou código..." 
+          placeholder="Buscar por produto, código ou responsável..." 
           value={busca} 
           onChange={(e) => setBusca(e.target.value)} 
           style={{ background: '#0f172a', border: '1px solid #334155', padding: '10px', borderRadius: '6px', color: '#fff', flex: '1 1 300px' }}
@@ -139,6 +154,7 @@ export default function HistoricoMovimentacoes() {
                 <tr>
                   <th style={{ padding: '12px 16px' }}>Data</th>
                   <th style={{ padding: '12px 16px' }}>Produto</th>
+                  <th style={{ padding: '12px 16px' }}>Responsável</th>
                   <th style={{ padding: '12px 16px' }}>Tipo</th>
                   <th style={{ padding: '12px 16px' }}>Qtd</th>
                 </tr>
@@ -151,6 +167,9 @@ export default function HistoricoMovimentacoes() {
                     </td>
                     <td style={{ padding: '12px 16px', fontWeight: 'bold' }}>
                       {getNomeProduto(item.produto_id)}
+                    </td>
+                    <td style={{ padding: '12px 16px', color: '#cbd5e1' }}>
+                      {getResponsavel(item.user_id)}
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ 

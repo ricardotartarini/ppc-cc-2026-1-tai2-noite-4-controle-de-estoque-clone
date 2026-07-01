@@ -8,11 +8,11 @@ import Login from './pages/Login';
 import SolicitarCompraMateriais from './pages/SolicitarCompraMateriais';
 import MinhasSolicitacoesCompra from './pages/MinhasSolicitacoesCompra';
 import SaidaLaboratorioProfessor from './pages/SaidaLaboratorioProfessor';
-import AprovacaoComprasProfessor from './pages/AprovacaoComprasProfessor';
 import MenuPrincipal from './pages/MenuPrincipal';
 import ResetPassword from './pages/ResetPassword';
 import HistoricoMovimentacoes from './pages/HistoricoMovimentacoes';
 import GerenciarProfessores from './pages/GerenciarProfessores';
+import HistoricoRetiradasProfessor from './pages/HistoricoRetiradasProfessor';
 import AppNavbar from './components/AppNavbar';
 import AppSidebar from './components/AppSidebar';
 
@@ -103,7 +103,7 @@ function App() {
             <Route path="/tecnico/gerenciar-professores" element={<TecnicoRoute userRole={userRole}><GerenciarProfessores /></TecnicoRoute>} />
 
             <Route path="/professor/saida-laboratorio" element={<ProfessorRoute userRole={userRole}><SaidaLaboratorioProfessor /></ProfessorRoute>} />
-            <Route path="/professor/aprovar-compras" element={<ProfessorRoute userRole={userRole}><AprovacaoComprasProfessor /></ProfessorRoute>} />
+            <Route path="/professor/historico-retiradas" element={<ProfessorRoute userRole={userRole}><HistoricoRetiradasProfessor /></ProfessorRoute>} />
 
           </Route>
         </Route>

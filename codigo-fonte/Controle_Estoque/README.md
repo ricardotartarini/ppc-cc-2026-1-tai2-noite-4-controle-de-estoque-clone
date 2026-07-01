@@ -72,7 +72,7 @@ npm run server:dev
 ## Funcionalidades
 - **Autenticação**: Login e registro de usuários (professores/técnicos)
 - **Controle de Estoque**: Visualização, entradas e saídas de materiais
-- **Solicitações de Compra**: Professores podem solicitar compras de materiais
+- **Solicitações de Compra**: Técnicos podem registrar solicitações de compra e acompanhar o histórico
 - **Interface Responsiva**: Design moderno e intuitivo
 
 ## Segurança

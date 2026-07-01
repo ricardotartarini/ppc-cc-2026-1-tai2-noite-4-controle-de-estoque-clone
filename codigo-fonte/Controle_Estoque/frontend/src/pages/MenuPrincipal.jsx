@@ -6,7 +6,7 @@ import { supabase } from '../services/supabase';
 const ALL_CARDS = [
   { to: '/estoque', icon: '📦', title: 'Controle de estoque', description: 'Consulte códigos e quantidades disponíveis.', roles: ['tecnico'] },
   { to: '/professor/saida-laboratorio', icon: '🧪', title: 'Saída (laboratório)', description: 'Registre materiais retirados para aulas práticas.', roles: ['professor'] },
-  { to: '/professor/aprovar-compras', icon: '✅', title: 'Aprovação de Compras', description: 'Gerencie as solicitações de insumos feitas pelos técnicos.', roles: ['professor'] },
+  { to: '/professor/historico-retiradas', icon: '📚', title: 'Histórico de retiradas', description: 'Veja todas as saídas já registradas na sua conta.', roles: ['professor'] },
   { to: '/tecnico/solicitar-compra', icon: '📝', title: 'Solicitar compra', description: 'Peça reposição de materiais ao setor responsável.', roles: ['tecnico'] },
   { to: '/tecnico/minhas-solicitacoes', icon: '📋', title: 'Histórico de compras', description: 'Veja o andamento das solicitações.', roles: ['tecnico'] },
   { to: '/tecnico/historico', icon: '🔍', title: 'Auditoria e Relatórios', description: 'Histórico completo de entradas e saídas com exportação CSV.', roles: ['tecnico'] }

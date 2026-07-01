@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 5000;
 
 const ALLOWED_USER_TYPES = ['professor', 'tecnico'];
 
-// Middleware global
 // CORS permite que o frontend em outra porta acesse esta API.
 // express.json() permite ler JSON do corpo da requisição.
 app.use(cors());
@@ -72,6 +71,24 @@ const identificarEntrada = (entrada, userType) => {
 const isTableMissingError = (error) => {
   const msg = (error?.message || '').toString().toLowerCase();
   return error?.code === 'PGRST205' || msg.includes('relation "usuarios" does not exist') || msg.includes('could not find the table');
+};
+
+const obterNomeUsuarioMovimentacao = async (userId, emailFallback) => {
+  if (!userId) {
+    return emailFallback || 'Usuario';
+  }
+
+  try {
+    const { data: usuario } = await supabase
+      .from('usuarios')
+      .select('nome_completo')
+      .eq('id', userId)
+      .single();
+
+    return usuario?.nome_completo || emailFallback || 'Usuario';
+  } catch (error) {
+    return emailFallback || 'Usuario';
+  }
 };
 
 // Routes
@@ -371,6 +388,7 @@ app.get('/api/estoque', authenticateToken, async (req, res) => {
 app.post('/api/estoque/movimentar', authenticateToken, async (req, res) => {
   try {
     const { id, tipo, quantidadeMovimentada } = req.body;
+    const nomeUsuario = await obterNomeUsuarioMovimentacao(req.user.id, req.user.email);
 
     // Get current item
     const { data: item, error: fetchError } = await supabase
@@ -415,8 +433,8 @@ app.post('/api/estoque/movimentar', authenticateToken, async (req, res) => {
         produto_id: id,
         tipo,
         quantidade: quantidadeMovimentada,
-        user_id: req.user.id,
-        criado_em: new Date()
+        usuario: nomeUsuario,
+        data: new Date().toISOString()
       });
 
     res.json(data);
@@ -474,26 +492,6 @@ app.post('/api/solicitacoes-compra', authenticateToken, async (req, res) => {
   }
 });
 
-// Endpoint para listar todas as solicitações (visível apenas para professores)
-app.get('/api/solicitacoes-compra/all', authenticateToken, async (req, res) => {
-  try {
-    if (req.user.userType !== 'professor') {
-      return res.status(403).json({ error: 'Acesso negado' });
-    }
-
-    const { data, error } = await supabase
-      .from('solicitacoes_compra')
-      .select('*')
-      .order('criado_em', { ascending: false });
-
-    if (error) return res.status(400).json({ error: error.message });
-
-    res.json(data || []);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
 // Laboratory Products Routes
 // Retorna todos os produtos do laboratório organizados por categoria
 app.get('/api/laboratorio-produtos', authenticateToken, async (req, res) => {
@@ -524,6 +522,78 @@ app.get('/api/laboratorio-produtos', authenticateToken, async (req, res) => {
     res.json({
       categorias: Object.keys(produtosPorCategoria),
       produtos: produtosPorCategoria
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+app.post('/api/laboratorio-produtos/saida', authenticateToken, async (req, res) => {
+  try {
+    const { produtoId, quantidade } = req.body;
+    const nomeUsuario = await obterNomeUsuarioMovimentacao(req.user.id, req.user.email);
+
+    if (!produtoId || !quantidade) {
+      return res.status(400).json({ error: 'Produto e quantidade são obrigatórios' });
+    }
+
+    const quantidadeRetirada = Number(quantidade);
+    if (!Number.isFinite(quantidadeRetirada) || quantidadeRetirada <= 0) {
+      return res.status(400).json({ error: 'Quantidade inválida' });
+    }
+
+    const { data: produto, error: produtoError } = await supabase
+      .from('laboratorio_produtos')
+      .select('id, codigo, nome, quantidade')
+      .eq('id', produtoId)
+      .single();
+
+    if (produtoError || !produto) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    const estoqueAtual = Number(produto.quantidade || 0);
+    if (estoqueAtual < quantidadeRetirada) {
+      return res.status(400).json({ error: `Saldo insuficiente! Estoque atual de apenas ${estoqueAtual} unidades.` });
+    }
+
+    const novaQuantidade = estoqueAtual - quantidadeRetirada;
+
+    const { data: produtoAtualizado, error: updateError } = await supabase
+      .from('laboratorio_produtos')
+      .update({ quantidade: novaQuantidade })
+      .eq('id', produtoId)
+      .select('id, codigo, nome, quantidade')
+      .single();
+
+    if (updateError) {
+      return res.status(400).json({ error: updateError.message });
+    }
+
+    const { data: movimentacao, error: movimentacaoError } = await supabase
+      .from('movimentacoes')
+      .insert({
+        produto_id: produtoId,
+        tipo: 'saida',
+        quantidade: quantidadeRetirada,
+        usuario: nomeUsuario,
+        data: new Date().toISOString()
+      })
+      .select('*')
+      .single();
+
+    if (movimentacaoError) {
+      await supabase
+        .from('laboratorio_produtos')
+        .update({ quantidade: estoqueAtual })
+        .eq('id', produtoId);
+
+      return res.status(400).json({ error: movimentacaoError.message });
+    }
+
+    res.json({
+      produto: produtoAtualizado,
+      movimentacao
     });
   } catch (error) {
     res.status(500).json({ error: 'Erro interno do servidor' });

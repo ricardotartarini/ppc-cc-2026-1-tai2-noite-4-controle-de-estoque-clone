@@ -12,6 +12,7 @@
 import React, { useEffect, useState } from 'react';
 import authService from '../services/auth';
 import { supabase } from '../services/supabase';
+import laboratorioService from '../services/laboratorioService';
 
 export default function SaidaLaboratorioProfessor() {
   const [user, setUser] = useState(null);
@@ -27,9 +28,6 @@ export default function SaidaLaboratorioProfessor() {
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
-
-  // NOVO ESTADO: Armazena o histórico de retiradas feitas enquanto a tela estiver aberta
-  const [retiradasSessao, setRetiradasSessao] = useState([]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -106,39 +104,10 @@ export default function SaidaLaboratorioProfessor() {
     }
 
     try {
-      const novaQuantidade = estoqueAtual - qtdSubtrair;
-      
-      const { error: errorUpdate } = await supabase
-        .from('laboratorio_produtos')
-        .update({ quantidade: novaQuantidade })
-        .eq('id', produtoId);
+      const response = await laboratorioService.registrarSaida(produtoId, qtdSubtrair);
+      const quantidadeAtualizada = response?.produto?.quantidade;
 
-      if (errorUpdate) throw errorUpdate;
-
-      const { error: errorMov } = await supabase
-        .from('movimentacoes')
-        .insert([{
-          produto_id: produtoId,
-          tipo: 'saida',
-          quantidade: qtdSubtrair,
-          user_id: user?.id || null
-        }]);
-
-      if (errorMov) console.error('Erro no histórico:', errorMov.message);
-
-      setProdutosBanco(prev => prev.map(p => p.id === produtoId ? { ...p, quantidade: novaQuantidade } : p));
-      
-      // Atualiza o painel lateral com o novo item retirado
-      setRetiradasSessao(prev => [
-        {
-          id: Date.now(),
-          nome: produtoSelecionado.nome,
-          codigo: produtoSelecionado.codigo,
-          qtd: qtdSubtrair,
-          hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        },
-        ...prev
-      ]);
+      setProdutosBanco(prev => prev.map(p => p.id === produtoId ? { ...p, quantidade: quantidadeAtualizada } : p));
 
       setSucesso(`Saída de ${qtdSubtrair} ${qtdSubtrair === 1 ? 'unidade' : 'unidades'} do produto "${produtoSelecionado.nome}" registrada!`);
       setQuantidade('');
@@ -152,16 +121,13 @@ export default function SaidaLaboratorioProfessor() {
   };
 
   return (
-    <div className="page" style={{ padding: '24px', color: '#fff', display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-      
-      {/* LADO ESQUERDO: Formulário de Saída */}
-      <div style={{ flex: '1 1 500px' }}>
+    <div className="page" style={{ padding: '24px', color: '#fff' }}>
         <header className="page__header" style={{ marginBottom: '24px' }}>
           <h1 className="page__title" style={{ fontSize: '26px', fontWeight: 'bold' }}>🧪 Saída de Material (Laboratório)</h1>
           <p className="page__subtitle" style={{ color: '#94a3b8' }}>Registre a retirada de insumos para aulas práticas.</p>
         </header>
 
-        <div className="ui-card" style={{ background: '#1e293b', padding: '30px', borderRadius: '12px', border: '1px solid #334155' }}>
+        <div className="ui-card" style={{ background: '#1e293b', padding: '30px', borderRadius: '12px', border: '1px solid #334155', maxWidth: '720px' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
             <div className="form-field" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -210,39 +176,6 @@ export default function SaidaLaboratorioProfessor() {
             </button>
           </form>
         </div>
-      </div>
-
-      {/* LADO DIREITO: Painel visual de acompanhamento da sessão */}
-      <div style={{ flex: '1 1 300px', background: '#0f172a', padding: '24px', borderRadius: '12px', border: '1px solid #1e293b' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #334155', paddingBottom: '15px' }}>
-          <span style={{ fontSize: '20px' }}>📋</span>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#f8fafc', margin: 0 }}>
-            Retiradas Recentes
-          </h3>
-        </div>
-        
-        {retiradasSessao.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '30px 0', color: '#64748b' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}>Nenhuma retirada registrada nesta sessão.</p>
-            <p style={{ fontSize: '12px', marginTop: '5px' }}>Os itens aparecerão aqui após a confirmação.</p>
-          </div>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {retiradasSessao.map(item => (
-              <li key={item.id} style={{ background: '#1e293b', padding: '14px', borderRadius: '8px', borderLeft: '4px solid #10b981', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '14px', color: '#f8fafc' }}>{item.nome}</span>
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>Código: {item.codigo} • {item.hora}</span>
-                </div>
-                <div style={{ background: '#047857', color: '#fff', padding: '6px 10px', borderRadius: '6px', fontWeight: 'bold', fontSize: '14px' }}>
-                  -{item.qtd}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
     </div>
   );
 }

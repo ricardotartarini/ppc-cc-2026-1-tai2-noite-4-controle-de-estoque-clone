@@ -68,6 +68,29 @@ export const laboratorioService = {
     }
   },
 
+  async registrarSaida(produtoId, quantidade) {
+    try {
+      const headers = authService.getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/laboratorio-produtos/saida`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ produtoId, quantidade })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Não foi possível registrar a saída');
+      }
+
+      const data = await response.json();
+      this.clearCache();
+      return data;
+    } catch (error) {
+      console.error('Erro ao registrar saída:', error);
+      throw error;
+    }
+  },
+
   /**
    * Limpa o cache (útil após atualizar produtos)
    */

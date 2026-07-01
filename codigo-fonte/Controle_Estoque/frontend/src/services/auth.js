@@ -99,6 +99,14 @@ export const authService = {
   // Função para obter token
   getToken: () => {
     return localStorage.getItem('token');
+  },
+
+  getAuthHeaders: () => {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    };
   }
 };
 

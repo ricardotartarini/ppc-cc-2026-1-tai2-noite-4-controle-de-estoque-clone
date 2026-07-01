@@ -4,7 +4,7 @@ import authService from '../services/auth';
 
 const PROF_LINKS = [
   { to: '/professor/saida-laboratorio', label: 'Saída laboratório' },
-  { to: '/professor/aprovar-compras', label: 'Aprovar compras' }
+  { to: '/professor/historico-retiradas', label: 'Histórico retiradas' }
 ];
 
 const TEC_LINKS = [
