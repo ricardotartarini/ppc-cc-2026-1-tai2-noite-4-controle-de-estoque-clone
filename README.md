@@ -41,7 +41,7 @@ Will Ricardo dos Santos Machado
 
 # Hospedagem
 
-* Insira o endereço eletrônico público de acesso ao conteúdo publicado. 
+ [Site - Med_Estoque](https://ppc-cc-2026-1-tai2-noite-4-controle-de-estoque-clone-186lxqfna.vercel.app/login)
 
 # Código-Fonte
 
