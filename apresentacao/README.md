@@ -1,32 +1,23 @@
 # Apresentação do Projeto
 
-## Conjunto de Slides
+Esta seção centraliza as informações sobre a homologação e a defesa final do MVP do sistema **Med_Estoque**.
 
-A apresentação do projeto consiste na geração de um conjunto de slides em um arquivo no formato ppt, pptx ou pdf, contemplando os seguintes itens:
+---
 
-> - Contexto (Problema, Público-alvo)
-> - Requisitos
-> - Solução Implementada (funcionalidades de software)
-> - Conclusão da elaboração do projeto (pontos positivos, desafios, aprendizado).
+## 🏫 Apresentação Presencial (Em Sala de Aula)
 
-[Adicione pdf de apresentação.]
+A defesa e validação deste projeto serão realizadas de forma **presencial e ao vivo em sala de aula**. A equipe conduzirá a apresentação demonstrando o MVP em tempo real diretamente pelo ambiente homologado na nuvem.
 
-> **Links Úteis**:
-> - [A regra 10-20-30 para apresentações de sucesso](https://revistapegn.globo.com/Noticias/noticia/2014/07/regra-10-20-30-para-apresentacoes-de-sucesso.html)
-> - [Top Tips for Effective Presentations](https://www.skillsyouneed.com/present/presentation-tips.html)
-> - [How to make a great presentation](https://www.ted.com/playlists/574/how_to_make_a_great_presentation)
+A dinâmica da apresentação presencial abordará os seguintes tópicos estruturais:
+* **Contexto Real:** O problema da falta de controle de insumos e vidrarias em laboratórios acadêmicos e como o sistema atende Técnicos e Professores.
+* **Mapeamento de Requisitos:** Demonstração prática de como os Requisitos Funcionais (RF-01 ao RF-04) foram traduzidos em linhas de código.
+* **Validação das Regras de Negócio:** Teste ao vivo do sistema de bloqueio por saldo insuficiente e do fluxo de permissões por perfil.
+* **Retrospectiva da Equipe:** Análise dos desafios enfrentados nas Sprints do SCRUM, pontos positivos do design e os principais aprendizados práticos de engenharia de software obtidos no semestre.
 
-## Vídeo de apresentação
+---
 
-A equipe também deverá gravar um vídeo de, no máximo, três minutos, com a apresentação da solução. Vocês deverão abrir a aplicação hospedada e apresentar o seu funcionamento.  Poderão ser utilizados quaisquer recursos na montagem do vídeo, mas não se esqueçam de mostrar as funcionalidades da aplicação. Seguem as especificações técnicas que devem ser obedecidas na geração do vídeo:
+## 🌐 Hospedagem da Aplicação (Link Oficial)
 
-> - tamanho do arquivo limitado a 90Mb
-> - taxa de FPS limitada a 30 quadros por segundo
-> - resolução HD (720p) ou Full HD (1080p)
-> - formato mp4.
+Para a avaliação do corpo docente e execução dos testes durante a apresentação, a aplicação encontra-se publicada de forma estável na plataforma **Vercel**:
 
-[Adicione vídeo de apresentação.]
-
-## Hospedagem
-
-[Adicione o endereço eletrônico público onde o site encontra-se hospedado.]
+🔗 **Link de Acesso:** [Med_Estoque - Produção na Vercel](https://ppc-cc-2026-1-tai2-noite-4-controle-de-estoque-clone-186lxqfna.vercel.app/login)
