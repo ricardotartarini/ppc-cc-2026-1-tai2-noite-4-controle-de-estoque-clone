@@ -61,4 +61,4 @@ Este relatório consolida as evidências de execução dos testes funcionais pla
 
 ## 📈 Conclusão das Validações
 
-Todos os testes funcionais críticos projetados para o escopo do MVP rodaram com **100% de sucesso**. A integridade dos saldos foi mantida, a interface em Modo Escuro apresentou excelente tempo de resposta visual e o fluxo de privilégios de usuários foi respeitado em todas as rotas operadas.
+Todos os testes funcionais críticos projetados para o escopo do MVP rodaram com sucesso. A integridade dos saldos foi mantida, a interface em Modo Escuro apresentou excelente tempo de resposta visual e o fluxo de privilégios de usuários foi respeitado em todas as rotas operadas.
